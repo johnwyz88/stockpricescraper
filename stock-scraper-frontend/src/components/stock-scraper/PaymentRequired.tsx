@@ -1,6 +1,6 @@
 import { LockKeyhole } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { \0 } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
 
 interface PaymentRequiredProps {
   onProceedToPayment: () => void;

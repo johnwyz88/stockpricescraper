@@ -1,7 +1,7 @@
 import { Download, ExternalLink } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { \0 } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { \0 } from "../../components/ui/alert";
 
 interface StockData {
   s3_uri: string;

@@ -3,6 +3,7 @@ import { StockScraperForm } from './components/stock-scraper/StockScraperForm';
 import { StockScraperResults } from './components/stock-scraper/StockScraperResults';
 import { PaymentRequired } from './components/stock-scraper/PaymentRequired';
 import { StripePaymentForm } from './components/stock-scraper/StripePaymentForm';
+import stockScraperApi, { ScrapeRequestParams } from './services/api';
 
 interface FormValues {
   stockSymbols: string[];
@@ -33,21 +34,24 @@ function App() {
     setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const mockResponse: StockData = {
-        s3_uri: "s3://stock-data-bucket/data/stock_data_AAPL_MSFT_20250508123456.json",
-        download_url: "https://example.com/download/stock_data_AAPL_MSFT_20250508123456.json",
-        expiration: "1 hour",
-        stock_symbols: values.stockSymbols,
-        start_date: values.startDate.toISOString().split('T')[0],
-        end_date: values.endDate.toISOString().split('T')[0],
-        output_format: values.outputFormat
+      const requestParams: ScrapeRequestParams = {
+        stockSymbols: values.stockSymbols,
+        startDate: values.startDate.toISOString().split('T')[0],
+        endDate: values.endDate.toISOString().split('T')[0],
+        outputFormat: values.outputFormat
       };
       
-      setResult(mockResponse);
+      const apiResponse = import.meta.env.DEV 
+        ? await stockScraperApi.mockScrapeStockData(requestParams)
+        : await stockScraperApi.scrapeStockData(requestParams);
+      
+      setResult(apiResponse);
     } catch (err) {
-      setError("An error occurred while processing your request. Please try again.");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An error occurred while processing your request. Please try again.");
+      }
       console.error(err);
     } finally {
       setIsPending(false);

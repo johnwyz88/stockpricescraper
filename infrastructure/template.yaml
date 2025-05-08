@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Stock Price Scraper Lambda Function
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prod
+    Description: Environment (dev or prod)
+  
+  ScraperApiKey:
+    Type: String
+    Description: API key for ScraperAPI service
+    NoEcho: true
+  
+  S3BucketName:
+    Type: String
+    Default: stock-data-bucket
+    Description: Name of the S3 bucket to store scraped data
+
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 256
+    Runtime: python3.9
+    Environment:
+      Variables:
+        SCRAPER_API_KEY: !Ref ScraperApiKey
+        S3_BUCKET_NAME: !Ref S3BucketName
+        AWS_REGION: !Ref AWS::Region
+        ENVIRONMENT: !Ref Environment
+
+Resources:
+  StockDataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldData
+            Status: Enabled
+            ExpirationInDays: 30
+  
+  StockScraperFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub stock-scraper-${Environment}
+      CodeUri: ../scraper/
+      Handler: lambda_handler.lambda_handler
+      Description: Lambda function to scrape stock data
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - S3CrudPolicy:
+            BucketName: !Ref S3BucketName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /scrape
+            Method: post
+  
+  StockScraperApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'POST, OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowOrigin: "'*'"
+      Auth:
+        ApiKeyRequired: true
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Description: Usage plan for Stock Scraper API
+          Quota:
+            Limit: 100
+            Period: DAY
+          Throttle:
+            BurstLimit: 10
+            RateLimit: 5
+
+Outputs:
+  StockScraperFunction:
+    Description: Stock Scraper Lambda Function ARN
+    Value: !GetAtt StockScraperFunction.Arn
+  
+  StockScraperApi:
+    Description: API Gateway endpoint URL for Stock Scraper
+    Value: !Sub https://${StockScraperApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/scrape
+  
+  StockDataBucket:
+    Description: S3 Bucket for storing stock data
+    Value: !Ref StockDataBucket

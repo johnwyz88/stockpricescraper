@@ -1,0 +1,12 @@
+# Core dependencies
+requests==2.31.0
+beautifulsoup4==4.12.2
+pandas==2.1.0
+boto3==1.28.38
+
+# AWS Lambda specific
+python-dotenv==1.0.0
+
+# Testing
+pytest==7.4.0
+pytest-mock==3.11.1

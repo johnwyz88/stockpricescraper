@@ -214,5 +214,27 @@ def test_lambda_locally():
         return False
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description='Test Lambda function locally')
+    parser.add_argument('--output-format', type=str, default='json', choices=['json', 'csv'],
+                        help='Output format (json or csv)')
+    parser.add_argument('--stock-symbols', type=str, default='nike,coca-cola-co,microsoft-corp',
+                        help='Comma-separated list of stock symbols')
+    parser.add_argument('--start-date', type=str, default='2023-01-01',
+                        help='Start date for stock data (YYYY-MM-DD)')
+    parser.add_argument('--end-date', type=str, default='2023-01-31',
+                        help='End date for stock data (YYYY-MM-DD)')
+    args = parser.parse_args()
+    
+    global event
+    event = {
+        'body': json.dumps({
+            'stock_symbols': args.stock_symbols.split(','),
+            'start_date': args.start_date,
+            'end_date': args.end_date,
+            'output_format': args.output_format
+        })
+    }
+    
     test_result = test_lambda_locally()
     sys.exit(0 if test_result else 1)

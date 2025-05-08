@@ -1,0 +1,16 @@
+{
+  "name": "stock-price-scraper",
+  "version": "1.0.0",
+  "description": "Stock Price Scraper Lambda Function",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "bash deploy.sh",
+    "test": "cd ../scraper && python -m pytest"
+  },
+  "author": "John Wang",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "aws-sam-cli": "^1.0.0"
+  }
+}

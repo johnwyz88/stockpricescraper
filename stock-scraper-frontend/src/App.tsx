@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StockScraperForm } from './components/stock-scraper/StockScraperForm';
 import { StockScraperResults } from './components/stock-scraper/StockScraperResults';
 import { PaymentRequired } from './components/stock-scraper/PaymentRequired';
+import { StripePaymentForm } from './components/stock-scraper/StripePaymentForm';
 
 interface FormValues {
   stockSymbols: string[];
@@ -80,27 +81,13 @@ function App() {
           </>
         )}
         
-        {/* This is a placeholder for the Stripe payment form that will be implemented in step 5 */}
         {showPaymentForm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-background rounded-lg p-6 max-w-md w-full">
-              <h2 className="text-xl font-bold mb-4">Payment Form</h2>
-              <p className="mb-4">This is a placeholder for the Stripe payment form that will be implemented in step 5.</p>
-              <div className="flex justify-end gap-2">
-                <button 
-                  className="px-4 py-2 border rounded-md"
-                  onClick={() => setShowPaymentForm(false)}
-                >
-                  Cancel
-                </button>
-                <button 
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
-                  onClick={handlePaymentSuccess}
-                >
-                  Simulate Payment
-                </button>
-              </div>
-            </div>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <StripePaymentForm 
+              onPaymentSuccess={handlePaymentSuccess}
+              onCancel={() => setShowPaymentForm(false)}
+              amount={5.00}
+            />
           </div>
         )}
       </main>

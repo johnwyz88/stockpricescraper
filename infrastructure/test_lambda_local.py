@@ -176,14 +176,7 @@ def test_lambda_locally():
     """
     print("Testing Lambda function locally...")
     
-    event = {
-        'body': json.dumps({
-            'stock_symbols': ['nike', 'coca-cola-co', 'microsoft-corp'],
-            'start_date': '2023-01-01',
-            'end_date': '2023-01-31',
-            'output_format': 'json'
-        })
-    }
+    global event
     
     try:
         response = lambda_handler(event, None)

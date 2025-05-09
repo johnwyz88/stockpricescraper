@@ -36,6 +36,7 @@ class DataProcessor:
         
         # If no date filtering is needed, return the original data
         if not start_date and not end_date:
+            logger.info(f"No date filtering applied, returning {len(stock_data)} items")
             return stock_data
         
         try:
@@ -57,6 +58,7 @@ class DataProcessor:
             for item in stock_data:
                 # Skip items without timestamp
                 if 'timestamp' not in item:
+                    logger.info(f"Item without timestamp added: {item}")
                     filtered_data.append(item)
                     continue
                 
@@ -66,17 +68,22 @@ class DataProcessor:
                     
                     # Check if the item is within the date range
                     if start_datetime and item_datetime < start_datetime:
+                        logger.info(f"Item filtered out (before start date): {item}")
                         continue
                     
                     if end_datetime and item_datetime > end_datetime:
+                        logger.info(f"Item filtered out (after end date): {item}")
                         continue
                     
+                    logger.info(f"Item within date range: {item}")
                     filtered_data.append(item)
                 except (ValueError, IndexError) as e:
                     logger.warning(f"Could not parse timestamp {item.get('timestamp')}: {e}")
                     # Include items with invalid timestamps
+                    logger.info(f"Item with invalid timestamp added: {item}")
                     filtered_data.append(item)
             
+            logger.info(f"Filtered data count: {len(filtered_data)}")
             return filtered_data
             
         except Exception as e:

@@ -13,7 +13,8 @@ Parameters:
   
   ScraperApiKey:
     Type: String
-    Description: API key for ScraperAPI service
+    Description: API key for ScraperAPI service (optional)
+    Default: ""
     NoEcho: true
   
   S3BucketName:

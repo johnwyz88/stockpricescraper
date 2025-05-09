@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import csv
 import json
 import logging
+import time
+import random
 from urllib.parse import urlencode
 from datetime import datetime
 
@@ -27,34 +29,66 @@ class StockScraper:
         self.api_key = api_key
         self.base_url = 'https://www.investing.com/equities/'
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Cache-Control': 'max-age=0'
         }
+        self.user_agents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:89.0) Gecko/20100101 Firefox/89.0'
+        ]
     
-    def _get_page_content(self, url):
+    def _get_page_content(self, url, max_retries=3, retry_delay=2):
         """
-        Get the page content using either direct requests or ScraperAPI
+        Get the page content using direct requests with retry logic and rotating user agents
         
         Args:
             url (str): URL to scrape
+            max_retries (int): Maximum number of retry attempts
+            retry_delay (int): Base delay between retries in seconds
             
         Returns:
             str: HTML content of the page
         """
-        try:
-            if self.api_key:
-                params = {
-                    'api_key': self.api_key,
-                    'url': url
-                }
-                response = requests.get('http://api.scraperapi.com/', params=urlencode(params))
-            else:
-                response = requests.get(url, headers=self.headers)
-            
-            response.raise_for_status()
-            return response.text
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Error fetching URL {url}: {e}")
-            raise
+        retries = 0
+        
+        while retries < max_retries:
+            try:
+                # If API key is provided, use ScraperAPI
+                if self.api_key:
+                    params = {
+                        'api_key': self.api_key,
+                        'url': url
+                    }
+                    response = requests.get('http://api.scraperapi.com/', params=urlencode(params))
+                else:
+                    current_headers = self.headers.copy()
+                    current_headers['User-Agent'] = random.choice(self.user_agents)
+                    
+                    time.sleep(random.uniform(0.5, 1.5))
+                    
+                    response = requests.get(url, headers=current_headers, timeout=10)
+                
+                response.raise_for_status()
+                return response.text
+                
+            except requests.exceptions.RequestException as e:
+                retries += 1
+                logger.warning(f"Attempt {retries}/{max_retries} failed for URL {url}: {e}")
+                
+                if retries >= max_retries:
+                    logger.error(f"Max retries reached for URL {url}")
+                    raise
+                
+                sleep_time = retry_delay * (2 ** (retries - 1)) + random.uniform(0, 1)
+                logger.info(f"Retrying in {sleep_time:.2f} seconds...")
+                time.sleep(sleep_time)
     
     def scrape_stock_data(self, stock_symbol, start_date=None, end_date=None):
         """

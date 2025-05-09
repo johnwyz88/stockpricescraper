@@ -36,8 +36,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ -z "$SCRAPER_API_KEY" ]; then
-  echo "Error: ScraperAPI key is required. Use --api-key parameter."
-  exit 1
+  echo "No ScraperAPI key provided. Using direct HTTP requests instead."
+  SCRAPER_API_KEY=""
 fi
 
 echo "Creating deployment package..."

@@ -20,9 +20,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-SCRAPER_API_KEY = os.environ.get('SCRAPER_API_KEY')
+SCRAPER_API_KEY = os.environ.get('SCRAPER_API_KEY', None)  # Now explicitly optional
 S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', 'stock-data-bucket')
-AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+AWS_REGION = os.environ.get('AWS_REGION', 'us-west-2')  # Default to us-west-2 as requested
 LOCAL_TESTING = os.environ.get('LOCAL_TESTING', 'false').lower() == 'true'
 TEMP_OUTPUT_DIR = os.environ.get('TEMP_OUTPUT_DIR', '/tmp')
 

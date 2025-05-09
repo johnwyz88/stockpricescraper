@@ -3,8 +3,8 @@ set -e
 
 STACK_NAME="stock-price-scraper"
 ENVIRONMENT="dev"
-S3_BUCKET_NAME="stock-data-bucket-$(date +%s)"
-REGION="us-east-1"
+S3_BUCKET_NAME="stock-price-scraper-1746765924"
+REGION="us-west-2"
 
 while [[ $# -gt 0 ]]; do
   case $1 in

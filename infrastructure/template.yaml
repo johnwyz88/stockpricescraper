@@ -19,7 +19,7 @@ Parameters:
   
   S3BucketName:
     Type: String
-    Default: stock-data-bucket
+    Default: stock-price-scraper-1746765924
     Description: Name of the S3 bucket to store scraped data
 
 Globals:

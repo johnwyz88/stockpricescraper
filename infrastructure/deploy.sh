@@ -56,9 +56,7 @@ sam deploy \
   --template-file template.yaml \
   --stack-name "$STACK_NAME" \
   --parameter-overrides \
-    Environment="$ENVIRONMENT" \
-    ScraperApiKey="$SCRAPER_API_KEY" \
-    S3BucketName="$S3_BUCKET_NAME" \
+    "ParameterKey=Environment,ParameterValue=$ENVIRONMENT ParameterKey=ScraperApiKey,ParameterValue=$SCRAPER_API_KEY ParameterKey=S3BucketName,ParameterValue=$S3_BUCKET_NAME" \
   --capabilities CAPABILITY_IAM \
   --region "$REGION" \
   --no-fail-on-empty-changeset

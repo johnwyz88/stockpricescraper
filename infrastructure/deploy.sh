@@ -40,14 +40,15 @@ if [ -z "$SCRAPER_API_KEY" ]; then
   SCRAPER_API_KEY=""
 fi
 
-echo "Creating deployment package..."
+echo "Creating minimal deployment package without pandas..."
 cd "$(dirname "$0")/../scraper"
-pip install -r requirements.txt -t ./package
-cp *.py ./package/
-cd ./package
-zip -r ../deployment-package.zip .
+mkdir -p ./minimal_package
+pip install requests==2.31.0 beautifulsoup4==4.12.2 boto3==1.28.38 -t ./minimal_package
+cp *.py ./minimal_package/
+cd ./minimal_package
+zip -r ../lambda_minimal.zip .
 cd ..
-rm -rf ./package
+rm -rf ./minimal_package
 
 echo "Deploying Lambda function using AWS SAM..."
 cd "$(dirname "$0")"

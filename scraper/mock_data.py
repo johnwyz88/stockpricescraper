@@ -1,27 +1,27 @@
 """
-Mock data for testing the scraper without making actual HTTP requests
+Mock stock data for testing
 """
 
 MOCK_STOCK_DATA = {
-    'nike': {
-        'symbol': 'nike',
-        'company_name': 'Nike Inc',
-        'current_price': '98.76',
-        'price_change': '+1.23',
-        'timestamp': '2025-05-08T21:30:00'
+    'AAPL': {
+        'symbol': 'AAPL',
+        'company_name': 'Apple Inc.',
+        'current_price': '175.50',
+        'price_change': '+2.30',
+        'timestamp': '2024-05-09T00:00:00'
     },
-    'coca-cola-co': {
-        'symbol': 'coca-cola-co',
-        'company_name': 'The Coca-Cola Company',
-        'current_price': '65.43',
-        'price_change': '-0.32',
-        'timestamp': '2025-05-08T21:30:00'
-    },
-    'microsoft-corp': {
-        'symbol': 'microsoft-corp',
+    'MSFT': {
+        'symbol': 'MSFT',
         'company_name': 'Microsoft Corporation',
-        'current_price': '345.67',
-        'price_change': '+5.67',
-        'timestamp': '2025-05-08T21:30:00'
+        'current_price': '415.20',
+        'price_change': '+1.75',
+        'timestamp': '2024-05-09T00:00:00'
+    },
+    'GOOGL': {
+        'symbol': 'GOOGL',
+        'company_name': 'Alphabet Inc.',
+        'current_price': '178.90',
+        'price_change': '-0.45',
+        'timestamp': '2024-05-09T00:00:00'
     }
 }

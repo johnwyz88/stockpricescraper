@@ -87,7 +87,7 @@ class S3Manager:
         Upload data directly to S3
         
         Args:
-            data: Data to upload (dict, list, DataFrame, etc.)
+            data: Data to upload (dict, list, etc.)
             object_key (str): S3 object key
             file_format (str): Format of the data ('json' or 'csv')
             
@@ -96,10 +96,8 @@ class S3Manager:
         """
         try:
             if file_format.lower() == 'json':
-                if hasattr(data, 'to_json'):  # Handle pandas DataFrame
-                    content = data.to_json(orient='records')
-                else:  # Handle dict or list
-                    content = json.dumps(data)
+                # Handle dict or list
+                content = json.dumps(data)
                 
                 self.s3_client.put_object(
                     Bucket=self.bucket_name,
@@ -109,16 +107,24 @@ class S3Manager:
                 )
             
             elif file_format.lower() == 'csv':
-                if hasattr(data, 'to_csv'):  # Handle pandas DataFrame
-                    content = data.to_csv(index=False)
+                if not data or not isinstance(data, list):
+                    logger.error("Data must be a list of dictionaries for CSV format")
+                    raise ValueError("Data must be a list of dictionaries for CSV format")
+                
+                if len(data) > 0:
+                    headers = list(data[0].keys())
+                    csv_content = ','.join(headers) + '\n'
+                    
+                    for item in data:
+                        row = ','.join([str(item.get(header, '')) for header in headers])
+                        csv_content += row + '\n'
                 else:
-                    logger.error("Data must be a pandas DataFrame for CSV format")
-                    raise ValueError("Data must be a pandas DataFrame for CSV format")
+                    csv_content = ''
                 
                 self.s3_client.put_object(
                     Bucket=self.bucket_name,
                     Key=object_key,
-                    Body=content,
+                    Body=csv_content,
                     ContentType='text/csv'
                 )
             
